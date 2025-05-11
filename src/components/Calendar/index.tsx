@@ -28,6 +28,70 @@ type CalendarContainerProps = {
   auth: UserInstance;
 };
 
+type EventModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  event: any;
+  staff: any;
+  shift: any;
+};
+
+type StaffListProps = {
+  staffs: any[];
+  selectedStaffId: string | null;
+  onStaffSelect: (id: string) => void;
+  classes: string[];
+};
+
+const EventModal = ({ isOpen, onClose, event, staff, shift }: EventModalProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="event-modal-overlay" onClick={onClose}>
+      <div className="event-modal" onClick={e => e.stopPropagation()}>
+        <div className="event-modal-header">
+          <h3>Etkinlik Detayları</h3>
+          <button onClick={onClose} aria-label="Kapat">&times;</button>
+        </div>
+        <div className="event-modal-content">
+          <p><strong>Personel:</strong> {staff?.name}</p>
+          <p><strong>Vardiya:</strong> {shift?.name}</p>
+          <p><strong>Tarih:</strong> {dayjs(event?.date).format('DD.MM.YYYY')}</p>
+          <p><strong>Başlangıç:</strong> {dayjs(event?.date).format('HH:mm')}</p>
+          <p><strong>Bitiş:</strong> {dayjs(event?.date).add(1, 'hour').format('HH:mm')}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StaffList = ({ staffs, selectedStaffId, onStaffSelect, classes }: StaffListProps) => (
+  <div className="staff-list">
+    {staffs?.map((staff: any, index: number) => (
+      <div
+        key={staff.id}
+        onClick={() => onStaffSelect(staff.id)}
+        className={`staff ${staff.id === selectedStaffId ? "active" : ""}`}
+        style={{ borderColor: classes[index] }}
+        role="button"
+        tabIndex={0}
+        onKeyPress={(e) => e.key === 'Enter' && onStaffSelect(staff.id)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="20px"
+          viewBox="0 -960 960 960"
+          width="20px"
+          aria-hidden="true"
+        >
+          <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17-62.5t47-43.5q60-30 124.5-46T480-440q67 0 131.5 16T736-378q30 15 47 43.5t17 62.5v112H160Zm320-400q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Z" />
+        </svg>
+        <span>{staff.name}</span>
+      </div>
+    ))}
+  </div>
+);
+
 const classes = [
   "bg-one",
   "bg-two",
@@ -73,10 +137,12 @@ const classes = [
 
 const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
   const calendarRef = useRef<FullCalendar>(null);
-
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [events, setEvents] = useState<EventInput[]>([]);
   const [highlightedDates, setHighlightedDates] = useState<string[]>([]);
   const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+  const [pairDates, setPairDates] = useState<{ [key: string]: string }>({});
   const [initialDate, setInitialDate] = useState<Date>(
     dayjs(schedule?.scheduleStartDate).toDate()
   );
@@ -128,10 +194,36 @@ const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
     return dates;
   };
 
+  const getPairDates = () => {
+    const pairs: { [key: string]: string } = {};
+    
+    // Seçili personelin pair'lerini bul
+    const selectedStaff = schedule?.staffs?.find(staff => staff.id === selectedStaffId);
+    if (!selectedStaff?.pairList) return pairs;
+
+    // Her pair için tarih aralığını ve rengi belirle
+    selectedStaff.pairList.forEach((pair: any) => {
+      const pairStaff = schedule?.staffs?.find(staff => staff.id === pair.staffId);
+      if (!pairStaff) return;
+
+      const dates = getDatesBetween(pair.startDate, pair.endDate);
+      const staffIndex = schedule?.staffs?.findIndex(staff => staff.id === pair.staffId) || 0;
+      const color = classes[staffIndex];
+
+      dates.forEach(date => {
+        pairs[date] = color;
+      });
+    });
+
+    return pairs;
+  };
+
   const generateStaffBasedCalendar = () => {
     const works: EventInput[] = [];
 
     for (let i = 0; i < schedule?.assignments?.length; i++) {
+      if (schedule?.assignments?.[i]?.staffId !== selectedStaffId) continue;
+
       const className = schedule?.shifts?.findIndex(
         (shift) => shift.id === schedule?.assignments?.[i]?.shiftId
       );
@@ -173,6 +265,7 @@ const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
 
     setHighlightedDates(highlightedDates);
     setEvents(works);
+    setPairDates(getPairDates());
   };
 
   useEffect(() => {
@@ -192,38 +285,36 @@ const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
     );
   };
 
+  const handleEventClick = (info: any) => {
+    const event = info.event;
+    const staff = getStaffById(event.extendedProps.staffId);
+    const shift = getShiftById(event.extendedProps.shiftId);
+    
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleStaffSelect = (staffId: string) => {
+    setSelectedStaffId(staffId);
+  };
+
   return (
     <div className="calendar-section">
       <div className="calendar-wrapper">
-        <div className="staff-list">
-          {schedule?.staffs?.map((staff: any) => (
-            <div
-              key={staff.id}
-              onClick={() => setSelectedStaffId(staff.id)}
-              className={`staff ${
-                staff.id === selectedStaffId ? "active" : ""
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="20px"
-                viewBox="0 -960 960 960"
-                width="20px"
-              >
-                <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17-62.5t47-43.5q60-30 124.5-46T480-440q67 0 131.5 16T736-378q30 15 47 43.5t17 62.5v112H160Zm320-400q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm160 228v92h80v-32q0-11-5-20t-15-14q-14-8-29.5-14.5T640-332Zm-240-21v53h160v-53q-20-4-40-5.5t-40-1.5q-20 0-40 1.5t-40 5.5ZM240-240h80v-92q-15 5-30.5 11.5T260-306q-10 5-15 14t-5 20v32Zm400 0H320h320ZM480-640Z" />
-              </svg>
-              <span>{staff.name}</span>
-            </div>
-          ))}
-        </div>
+        <StaffList
+          staffs={schedule?.staffs || []}
+          selectedStaffId={selectedStaffId}
+          onStaffSelect={handleStaffSelect}
+          classes={classes}
+        />
         <FullCalendar
           ref={calendarRef}
           locale={auth.language}
           plugins={getPlugins()}
-          contentHeight={400}
+          contentHeight={500}
           handleWindowResize={true}
           selectable={true}
-          editable={true}
+          editable={false}
           eventOverlap={true}
           eventDurationEditable={false}
           initialView="dayGridMonth"
@@ -233,6 +324,7 @@ const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
           dayMaxEventRows={4}
           fixedWeekCount={true}
           showNonCurrentDates={true}
+          eventClick={handleEventClick}
           eventContent={(eventInfo: any) => (
             <RenderEventContent eventInfo={eventInfo} />
           )}
@@ -275,12 +367,15 @@ const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
             const isHighlighted = highlightedDates.includes(
               dayjs(date).format("DD-MM-YYYY")
             );
+            const formattedDate = dayjs(date).format("DD-MM-YYYY");
+            const pairColor = pairDates[formattedDate];
 
             return (
               <div
                 className={`${found ? "" : "date-range-disabled"} ${
                   isHighlighted ? "highlighted-date-orange" : ""
-                } highlightedPair`}
+                } ${pairColor ? "highlightedPair" : ""}`}
+                style={pairColor ? { borderBottomColor: pairColor } : undefined}
               >
                 {dayjs(date).date()}
               </div>
@@ -288,6 +383,13 @@ const CalendarContainer = ({ schedule, auth }: CalendarContainerProps) => {
           }}
         />
       </div>
+      <EventModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        event={selectedEvent}
+        staff={selectedEvent ? getStaffById(selectedEvent.extendedProps.staffId) : null}
+        shift={selectedEvent ? getShiftById(selectedEvent.extendedProps.shiftId) : null}
+      />
     </div>
   );
 };

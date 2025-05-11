@@ -1,35 +1,244 @@
-.profile-calendar-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+// Font imports
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+// Color variables
+$teal-50: #e0f7fa;
+$teal-100: #b2ebf2;
+$teal-200: #80deea;
+$teal-300: #4dd0e1;
+$teal-400: #26c6da;
+$teal-500: #008080;
+$teal-600: #00acc1;
+$teal-700: #0097a7;
+$teal-800: #00838f;
+$teal-900: #006064;
+$white: #ffffff;
+$gray-50: #fafafa;
+$gray-100: #f5f5f5;
+$gray-200: #eeeeee;
+$gray-300: #e0e0e0;
+$gray-400: #bdbdbd;
+$gray-500: #9e9e9e;
+$gray-600: #757575;
+$gray-700: #616161;
+$gray-800: #424242;
+$gray-900: #212121;
+
+// Global styles
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, $teal-500 0%, $teal-700 100%);
+  min-height: 100vh;
+  margin: 0;
   padding: 20px;
-  background-color: #f9f9f9;
+  color: $gray-800;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-x: hidden;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    z-index: -1;
+  }
+}
+
+.profile-calendar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  width: 40%;
+  padding: 2.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  gap: 16px;
-  background-color: #fff;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  gap: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(to bottom, $teal-500, $teal-700);
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $teal-400 0%, $teal-500 100%);
+    color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 600;
+    box-shadow: 0 10px 20px rgba(0, 188, 212, 0.3);
+    position: relative;
+    z-index: 1;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $teal-400 0%, $teal-500 100%);
+      z-index: -1;
+      opacity: 0.5;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .profile-info {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(to right, #004d4d, #003333);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      color: $teal-700;
+    }
+
+    .profile-email {
+      font-size: 1.1rem;
+      color: $teal-700;
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0, 188, 212, 0.1);
+      border-radius: 12px;
+      width: fit-content;
+      backdrop-filter: blur(5px);
+
+      &::before {
+        content: '✉';
+        font-size: 1rem;
+      }
+    }
+
+    .profile-role {
+      display: inline-flex;
+      align-items: center;
+      background: $teal-500;
+      color: $white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: 1rem 0;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(0, 188, 212, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+      transition: all 0.3s ease;
+
+      &::before {
+        content: '👑';
+        margin-right: 0.5rem;
+        font-size: 1rem;
+      }
+
+      &:hover {
+        background: $teal-400;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  .logout-button {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(0, 188, 212, 0.1);
+    border: none;
+    color: $teal-700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(0, 188, 212, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $teal-500;
+      color: $white;
+      border-color: $teal-500;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover svg {
+      transform: translateX(3px);
+    }
+  }
 }
 
-.profile-info h2 {
-  margin: 0 0 8px;
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
 }
 
 .calendar-section {
-  background-color: #fff;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  /* height: 100%; */
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 20px 0;
 }
 
 .calendar-wrapper {
-  min-height: 400px;
+  min-height: 500px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .staff-calendar-container {
@@ -145,56 +354,56 @@
   }
 
   .bg-one {
-    background: #fcc729;
-    border: 1px solid #ffffff;
+    background: $teal-500;
+    border: 1px solid $white;
   }
 
   .bg-two {
-    background: #ff8847;
-    border: 1px solid #ffffff;
+    background: $teal-400;
+    border: 1px solid $white;
   }
 
   .bg-three {
-    background: #c0c033;
-    border: 1px solid #ffffff;
+    background: $teal-600;
+    border: 1px solid $white;
   }
 
   .bg-four {
-    background: #32a852;
-    border: 1px solid #ffffff;
+    background: $teal-300;
+    border: 1px solid $white;
   }
 
   .bg-five {
-    background: #32a8a2;
-    border: 1px solid #ffffff;
+    background: $teal-700;
+    border: 1px solid $white;
   }
 
   .bg-six {
-    background: #327ba8;
-    border: 1px solid #ffffff;
+    background: $teal-200;
+    border: 1px solid $white;
   }
 
   .bg-seven {
-    background: #3244a8;
-    border: 1px solid #ffffff;
+    background: $teal-800;
+    border: 1px solid $white;
   }
 
   .bg-eight {
-    background: #5a32a8;
-    border: 1px solid #ffffff;
+    background: $teal-100;
+    border: 1px solid $white;
   }
 
   .bg-nine {
-    background: #a832a4;
-    border: 1px solid #ffffff;
+    background: $teal-900;
+    border: 1px solid $white;
   }
 
   .bg-ten {
-    background: #fffe88;
-    border: 1px solid #000000;
+    background: $teal-50;
+    border: 1px solid $teal-700;
 
     .fc-event-main {
-      color: #000000 !important;
+      color: $teal-700 !important;
     }
   }
 
@@ -389,46 +598,228 @@
 }
 
 .staff-list {
-  margin: auto;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  padding: 0 4px;
 
   .staff {
-    min-height: 32px;
-    padding: 0 12px;
+    min-height: 40px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
-    gap: 4px;
-    background: #ffffff;
-    color: #19979c;
-    border: 1px solid #19979c;
-    border-radius: 8px;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: $teal-500;
+    border: 2px solid $teal-500;
+    border-radius: 20px;
     text-transform: capitalize;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 188, 212, 0.1);
+    backdrop-filter: blur(5px);
+    font-family: 'Roboto', sans-serif;
 
-    svg path {
-      fill: #19979c;
-      transition: all 0.3s;
+    &:hover {
+      background: $teal-500;
+      color: $white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 188, 212, 0.2);
     }
 
     &.active {
-      background: #19979c;
-      color: #ffffff;
+      background: $teal-500;
+      color: $white;
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
 
-      svg path {
-        fill: #ffffff;
+      &:hover {
+        background: $teal-400;
       }
     }
 
-    p {
-      color: inherit;
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    svg path {
+      fill: $teal-500;
+      transition: all 0.3s ease;
     }
   }
 }
 
 .highlightedPair {
-  content: "";
-  border-bottom: 5px solid rgba(194, 6, 138, 0.5) !important;
+  border-bottom: 3px solid !important;
+  transition: border-color 0.3s ease;
+}
+
+.event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.event-modal {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  animation: modalSlideIn 0.3s ease;
+
+  .event-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(0, 188, 212, 0.1);
+
+    h3 {
+      margin: 0;
+      color: $teal-500;
+      font-size: 1.5em;
+      font-weight: 600;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    button {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #666;
+      padding: 0;
+      line-height: 1;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: $teal-500;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .event-modal-content {
+    p {
+      margin: 16px 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: $gray-800;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400;
+
+      strong {
+        color: $teal-500;
+        margin-right: 12px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// FullCalendar özelleştirmeleri
+.fc {
+  .fc-toolbar {
+    padding: 16px;
+    margin-bottom: 0 !important;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    border-radius: 8px 8px 0 0;
+
+    .fc-toolbar-title {
+      font-size: 1.5em !important;
+      font-weight: 600;
+      color: $teal-700;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .fc-button {
+      padding: 8px 16px;
+      font-weight: 500;
+      text-transform: capitalize;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+
+      &.fc-button-primary {
+        background: $teal-500;
+        border-color: $teal-500;
+        box-shadow: 0 4px 12px rgba(0, 188, 212, 0.2);
+
+        &:hover {
+          background: $teal-400;
+          border-color: $teal-400;
+        }
+      }
+    }
+  }
+
+  .fc-daygrid-day {
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(0, 188, 212, 0.05);
+    }
+  }
+
+  .fc-daygrid-day-number {
+    padding: 8px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+  }
+
+  .fc-event {
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 2px 0;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 188, 212, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $teal-400;
+      transform: translateY(-1px);
+    }
+
+    .event-content {
+      p {
+        font-size: 12px;
+        font-weight: 500;
+        margin: 0;
+        color: #fff;
+        font-family: 'Roboto', sans-serif;
+      }
+    }
+  }
 }
